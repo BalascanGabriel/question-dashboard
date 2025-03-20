@@ -17,7 +17,7 @@ const ResetPasswordPage: React.FC = () => {
           <p className="text-muted-foreground">
             {token 
               ? 'Enter your new password below' 
-              : 'Enter your email and we'll send you a reset link'
+              : "Enter your email and we'll send you a reset link"
             }
           </p>
         </div>
