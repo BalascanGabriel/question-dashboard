@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 // Create axios instance
 const api: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
- // Replace with your actual API URL
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -30,6 +29,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
+    console.error('API Error:', error);
+    
     if (error.response) {
       // Server responded with an error
       const status = error.response.status;
@@ -42,6 +43,9 @@ api.interceptors.response.use(
         toast.error('You do not have permission to perform this action');
       } else if (status === 429) {
         toast.error('Rate limit exceeded. Please try again later.');
+      } else if (status === 404) {
+        console.warn('Resource not found:', error.config?.url);
+        // Don't show toast for 404s as they might be expected in some cases
       } else {
         const data = error.response.data as any;
         toast.error(data?.message || 'An error occurred');
@@ -81,7 +85,7 @@ export const authAPI = {
   },
   
   getProfile: async () => {
-    const response = await api.get('/auth/profile');
+    const response = await api.get('/users/profile');
     return response.data;
   }
 };
@@ -94,8 +98,19 @@ export const questionsAPI = {
   },
   
   getHistory: async (page = 1, limit = 10) => {
-    const response = await api.get(`/questions/history?page=${page}&limit=${limit}`);
-    return response.data;
+    try {
+      const response = await api.get(`/questions/history?page=${page}&limit=${limit}`);
+      return response.data;
+    } catch (error) {
+      console.warn('Failed to fetch question history, returning empty data');
+      // Return empty data structure for 404 errors
+      return {
+        questions: [],
+        total: 0,
+        page: 1,
+        totalPages: 1,
+      };
+    }
   }
 };
 

@@ -73,6 +73,8 @@ export function useQuestions() {
           questions: [mockResponse, ...prev.questions],
           total: prev.total + 1,
         }));
+
+        toast.info(`You have ${updatedUser.subscription.questionsRemaining} questions remaining`);
         
         return mockResponse;
       } else {
@@ -120,12 +122,13 @@ export function useQuestions() {
       }
     } catch (error) {
       console.error('Error fetching question history:', error);
-      // Error is handled by the API interceptor
-      return null;
+      
+      // In case of error, maintain current history but update loading state
+      return history;
     } finally {
       setIsLoading(false);
     }
-  }, [user, history.questions]);
+  }, [user, history]);
 
   return {
     isLoading,

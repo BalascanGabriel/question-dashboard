@@ -2,17 +2,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface GlassMorphicCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  title?: React.ReactNode;
-  description?: React.ReactNode;
-  footer?: React.ReactNode;
-  children: React.ReactNode;
-  className?: string;
-  headerClassName?: string;
-  contentClassName?: string;
-  footerClassName?: string;
-}
+import { GlassMorphicCardProps } from "./types";
 
 export function GlassMorphicCard({
   title,

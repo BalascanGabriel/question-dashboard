@@ -43,6 +43,24 @@ const createGuestUser = (): User => ({
   },
 });
 
+// Map the backend user model to our frontend User type
+const mapUserFromBackend = (backendUser: any): User => {
+  return {
+    id: backendUser._id || backendUser.id,
+    name: backendUser.name,
+    email: backendUser.email,
+    role: backendUser.role || 'user',
+    subscription: {
+      plan: backendUser.subscription || 'free',
+      questionsRemaining: 
+        typeof backendUser.questionCount === 'number' 
+          ? backendUser.questionCount 
+          : (backendUser.subscription === 'premium' ? 100 : 3),
+      expiresAt: backendUser.subscriptionExpiresAt || null,
+    },
+  };
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -58,7 +76,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (token) {
         try {
           const userData = await authAPI.getProfile();
-          setUser(userData);
+          setUser(mapUserFromBackend(userData));
+          console.log("User authenticated:", userData);
         } catch (error) {
           console.error('Failed to fetch user profile:', error);
           localStorage.removeItem('auth-token');
@@ -66,11 +85,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // If token is invalid but guest user exists, use that
           if (guestUser) {
             setUser(JSON.parse(guestUser));
+            console.log("Using guest user");
           }
         }
       } else if (guestUser) {
         // Use stored guest user if no valid token
         setUser(JSON.parse(guestUser));
+        console.log("Using stored guest user");
       }
       
       setIsLoading(false);
@@ -82,10 +103,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const { token, user } = await authAPI.login(email, password);
+      const { token, user: backendUser } = await authAPI.login(email, password);
       localStorage.setItem('auth-token', token);
       localStorage.removeItem('guest-user'); // Remove guest user if exists
-      setUser(user);
+      
+      const mappedUser = mapUserFromBackend(backendUser);
+      setUser(mappedUser);
+      console.log("Login successful:", mappedUser);
+      
       toast.success('Login successful');
       navigate('/dashboard');
     } catch (error) {
@@ -99,10 +124,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (name: string, email: string, password: string) => {
     setIsLoading(true);
     try {
-      const { token, user } = await authAPI.register(name, email, password);
+      const { token, user: backendUser } = await authAPI.register(name, email, password);
+      
+      // If registration was successful but no token, try to login
+      if (!token && backendUser) {
+        return await login(email, password);
+      }
+      
       localStorage.setItem('auth-token', token);
       localStorage.removeItem('guest-user'); // Remove guest user if exists
-      setUser(user);
+      
+      const mappedUser = mapUserFromBackend(backendUser);
+      setUser(mappedUser);
+      console.log("Registration successful:", mappedUser);
+      
       toast.success('Registration successful');
       navigate('/dashboard');
     } catch (error) {
@@ -126,6 +161,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('guest-user', JSON.stringify(guestUser));
     setUser(guestUser);
     navigate('/dashboard');
+    toast.success('Continuing as guest. You have 3 free questions.');
   };
 
   const requestPasswordReset = async (email: string) => {
