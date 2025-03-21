@@ -33,8 +33,8 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPasswordPage />} />
             </Route>
             
-            {/* Protected routes */}
-            <Route element={<AppLayout requireAuth={true} />}>
+            {/* Protected routes with guest access allowed */}
+            <Route element={<AppLayout requireAuth={true} allowGuest={true} />}>
               <Route path="/dashboard" element={<DashboardPage />} />
             </Route>
             

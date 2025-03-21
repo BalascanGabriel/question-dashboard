@@ -8,11 +8,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 interface AppLayoutProps {
   requireAuth?: boolean;
   requireAdmin?: boolean;
+  allowGuest?: boolean;
 }
 
 export const AppLayout: React.FC<AppLayoutProps> = ({
   requireAuth = false,
   requireAdmin = false,
+  allowGuest = false,
 }) => {
   const { isAuthenticated, isLoading, user } = useAuth();
 
@@ -33,8 +35,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     );
   }
 
-  // Redirect if auth is required but user is not authenticated
-  if (requireAuth && !isAuthenticated) {
+  // Allow guest users for pages with allowGuest=true
+  if (requireAuth && !isAuthenticated && !allowGuest) {
     return <Navigate to="/login" />;
   }
 
