@@ -10,10 +10,12 @@ const Index = () => {
   useEffect(() => {
     if (!isLoading) {
       // Redirect to dashboard if authenticated, otherwise to login
-      navigate(isAuthenticated ? '/dashboard' : '/login');
+      // Use replace: true to prevent back navigation to this page
+      navigate(isAuthenticated ? '/dashboard' : '/login', { replace: true });
     }
   }, [navigate, isAuthenticated, isLoading]);
 
+  // Show nothing while redirecting
   return null;
 };
 

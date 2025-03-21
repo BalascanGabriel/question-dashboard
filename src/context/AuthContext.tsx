@@ -76,7 +76,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (token) {
         try {
           const userData = await authAPI.getProfile();
-          setUser(mapUserFromBackend(userData));
+          const mappedUser = mapUserFromBackend(userData);
+          setUser(mappedUser);
           console.log("User authenticated:", userData);
         } catch (error) {
           console.error('Failed to fetch user profile:', error);
@@ -112,7 +113,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log("Login successful:", mappedUser);
       
       toast.success('Login successful');
-      navigate('/dashboard');
+      
+      // Force navigation to dashboard after successful login
+      setTimeout(() => {
+        navigate('/dashboard', { replace: true });
+      }, 100);
     } catch (error) {
       console.error('Login failed:', error);
       // Error handling is done in API interceptor
@@ -128,6 +133,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // If registration was successful but no token, try to login
       if (!token && backendUser) {
+        console.log("Registration successful, logging in...");
         return await login(email, password);
       }
       
@@ -139,7 +145,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log("Registration successful:", mappedUser);
       
       toast.success('Registration successful');
-      navigate('/dashboard');
+      
+      // Force navigation to dashboard after successful registration
+      setTimeout(() => {
+        navigate('/dashboard', { replace: true });
+      }, 100);
     } catch (error) {
       console.error('Registration failed:', error);
       // Error handling is done in API interceptor
@@ -160,7 +170,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const guestUser = createGuestUser();
     localStorage.setItem('guest-user', JSON.stringify(guestUser));
     setUser(guestUser);
-    navigate('/dashboard');
+    navigate('/dashboard', { replace: true });
     toast.success('Continuing as guest. You have 3 free questions.');
   };
 
