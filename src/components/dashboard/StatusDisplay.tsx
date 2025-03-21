@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { GlassMorphicCard } from '../common/GlassMorphicCard';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { CrownIcon, Sparkles } from 'lucide-react';
+import { CrownIcon, Sparkles, UserIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const StatusDisplay: React.FC = () => {
@@ -15,9 +15,10 @@ export const StatusDisplay: React.FC = () => {
   const { subscription } = user;
   const questionsRemaining = subscription.questionsRemaining;
   const isPremium = subscription.plan === 'premium';
+  const isGuest = user.role === 'guest';
   
   // Calculate progress percentage based on plan
-  const maxQuestions = isPremium ? 1000 : 10; // Example limits
+  const maxQuestions = isPremium ? 1000 : isGuest ? 3 : 10; // Example limits
   const usedPercentage = ((maxQuestions - questionsRemaining) / maxQuestions) * 100;
 
   return (
@@ -30,9 +31,11 @@ export const StatusDisplay: React.FC = () => {
         <div className={`px-3 py-1 rounded-full text-xs font-medium ${
           isPremium 
             ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' 
-            : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'
+            : isGuest
+              ? 'bg-gray-500/10 text-gray-500 border border-gray-500/20'
+              : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'
         }`}>
-          {isPremium ? 'Premium' : 'Free'}
+          {isPremium ? 'Premium' : isGuest ? 'Guest' : 'Free'}
         </div>
       </div>
 
@@ -54,7 +57,31 @@ export const StatusDisplay: React.FC = () => {
           </div>
         )}
 
-        {!isPremium && (
+        {isGuest && (
+          <div className="bg-accent/50 rounded-xl p-4 space-y-3 mt-auto">
+            <div className="flex items-center space-x-2 font-medium">
+              <UserIcon className="h-4 w-4 text-primary" />
+              <span>Create an Account</span>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Sign up for a free account to save your questions and get more features.
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <Button asChild size="sm" variant="outline">
+                <Link to="/login">
+                  Sign In
+                </Link>
+              </Button>
+              <Button asChild size="sm">
+                <Link to="/register">
+                  Sign Up
+                </Link>
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {!isPremium && !isGuest && (
           <div className="bg-accent/50 rounded-xl p-4 space-y-3 mt-auto">
             <div className="flex items-center space-x-2 font-medium">
               <Sparkles className="h-4 w-4 text-yellow-500" />

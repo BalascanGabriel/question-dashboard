@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
-  baseURL: 'https://api.example.com', // Replace with your actual API URL
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000', // Replace with your actual API URL
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Link } from 'react-router-dom';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, UserIcon } from 'lucide-react';
 import { GlassMorphicCard } from '../common/GlassMorphicCard';
 
 export const LoginForm: React.FC = () => {
-  const { login, isLoading } = useAuth();
+  const { login, isLoading, continueAsGuest } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -82,6 +82,25 @@ export const LoginForm: React.FC = () => {
           ) : (
             'Sign in'
           )}
+        </Button>
+
+        <div className="relative flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-border"></div>
+          </div>
+          <div className="relative px-4 text-xs uppercase bg-background text-muted-foreground">
+            Or
+          </div>
+        </div>
+
+        <Button 
+          type="button" 
+          variant="outline" 
+          className="w-full" 
+          onClick={continueAsGuest}
+        >
+          <UserIcon className="mr-2 h-4 w-4" />
+          Continue as Guest
         </Button>
 
         <div className="text-center text-sm">
