@@ -4,7 +4,8 @@ import { toast } from 'sonner';
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000', // Replace with your actual API URL
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+ // Replace with your actual API URL
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -60,12 +61,12 @@ api.interceptors.response.use(
 // Auth API
 export const authAPI = {
   login: async (email: string, password: string) => {
-    const response = await api.post('/auth/login', { email, password });
+    const response = await api.post('/users/login', { email, password });
     return response.data;
   },
   
   register: async (name: string, email: string, password: string) => {
-    const response = await api.post('/auth/register', { name, email, password });
+    const response = await api.post('/users/register', { name, email, password });
     return response.data;
   },
   
