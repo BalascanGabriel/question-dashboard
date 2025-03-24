@@ -1,7 +1,8 @@
 
 import { HTMLAttributes, ReactNode } from 'react';
 
-export interface GlassMorphicCardProps extends HTMLAttributes<HTMLDivElement> {
+// Use Omit to exclude the 'title' property from HTMLAttributes before extending
+export interface GlassMorphicCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   title?: ReactNode;
   description?: ReactNode;
   children?: ReactNode;

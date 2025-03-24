@@ -1,4 +1,3 @@
-
 import { useCallback, useState } from 'react';
 import { questionsAPI } from '../services/api';
 import { toast } from 'sonner';
@@ -18,6 +17,7 @@ interface PaginatedHistory {
   totalPages: number;
 }
 
+// Changed from arrow function to named function declaration for Fast Refresh compatibility
 export function useQuestions() {
   const [isLoading, setIsLoading] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
@@ -29,6 +29,7 @@ export function useQuestions() {
   });
   const { user } = useAuth();
 
+  
   const askQuestion = useCallback(async (question: string) => {
     if (!question.trim()) {
       toast.error('Question cannot be empty');
